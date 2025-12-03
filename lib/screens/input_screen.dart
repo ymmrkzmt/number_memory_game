@@ -77,15 +77,17 @@ class _InputScreenState extends State<InputScreen> {
     if (isCorrect) {
       newCumulativeScore = widget.cumulativeScore + 1;
     } else {
-      // 不正解の場合、これまでの連続正解数を記録として保存
-      final record = ScoreRecord(
-        mode: widget.mode,
-        difficulty: widget.difficulty,
-        score: widget.cumulativeScore, // 連続正解数をスコアとして記録
-        time: timeTaken,
-        dateTime: DateTime.now(),
-      );
-      ScoreManager.addScore(record);
+      // 不正解の場合、これまでの連続正解数が1以上であれば記録として保存
+      if (widget.cumulativeScore > 0) {
+        final record = ScoreRecord(
+          mode: widget.mode,
+          difficulty: widget.difficulty,
+          score: widget.cumulativeScore, // 連続正解数をスコアとして記録
+          time: timeTaken,
+          dateTime: DateTime.now(),
+        );
+        ScoreManager.addScore(record);
+      }
       newCumulativeScore = 0; // 連続正解数をリセット
     }
 

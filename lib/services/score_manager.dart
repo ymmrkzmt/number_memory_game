@@ -24,11 +24,15 @@ class ScoreManager {
               final decoded = json.decode(s);
               if (decoded is Map<String, dynamic>) {
                 return ScoreRecord.fromJson(decoded);
+              } else {
+                // JSONの形式が予期しないMapでない場合
+                debugPrint('スコア履歴の形式が不正です: $s');
+                return null;
               }
             } catch (e) {
               debugPrint('スコア履歴のデコードに失敗: $s, エラー: $e');
+              return null;
             }
-            return null;
           })
           .whereType<ScoreRecord>()
           .toList();
