@@ -76,7 +76,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   final prefs = await SharedPreferences.getInstance(); // ✅ 追加
                   await prefs.setString(
                       'difficulty', selectedDifficulty); // ✅ 難易度を保存
-                  print('[SettingsScreen] 難易度を保存: $selectedDifficulty');
+                  debugPrint('[SettingsScreen] 難易度を保存: $selectedDifficulty');
 
                   Navigator.pop(context, selectedDifficulty); // 既存の戻り処理
                 },

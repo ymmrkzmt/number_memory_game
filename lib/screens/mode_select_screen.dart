@@ -30,7 +30,7 @@ class _ModeSelectScreenState extends State<ModeSelectScreen> {
     final saved = prefs.getString('difficulty');
     if (saved != null) {
       setState(() => difficulty = saved);
-      print('[ModeSelectScreen] 保存された難易度を読み込み: $difficulty');
+      debugPrint('[ModeSelectScreen] 保存された難易度を読み込み: $difficulty');
     }
   }
 
@@ -43,7 +43,7 @@ class _ModeSelectScreenState extends State<ModeSelectScreen> {
 
     if (result != null && result is String) {
       setState(() => difficulty = result);
-      print('[ModeSelectScreen] 難易度が更新されました: $difficulty');
+      debugPrint('[ModeSelectScreen] 難易度が更新されました: $difficulty');
     }
   }
 

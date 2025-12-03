@@ -13,7 +13,7 @@ void initializeGoogleTag() {
 
     // GOOGLE_TAG_IDが設定されていない場合は何もしない
     if (googleTagId.isEmpty) {
-      print('Google Tag ID is not defined.');
+      debugPrint('Google Tag ID is not defined.');
       return;
     }
 

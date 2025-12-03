@@ -9,14 +9,20 @@ import '../widgets/score_history_list.dart';
 class ResultScreen extends StatefulWidget {
   final String userAnswer;
   final String correctAnswer;
+  final bool isCorrect;
+  final Duration timeTaken;
   final int cumulativeScore;
-  final ScoreRecord record;
+  final String mode;
+  final String difficulty;
 
   const ResultScreen({
     required this.userAnswer,
     required this.correctAnswer,
-    required this.record,
+    required this.isCorrect,
+    required this.timeTaken,
     required this.cumulativeScore,
+    required this.mode,
+    required this.difficulty,
     super.key,
   });
 
@@ -27,7 +33,7 @@ class ResultScreen extends StatefulWidget {
 class _ResultScreenState extends State<ResultScreen> {
   @override
   Widget build(BuildContext context) {
-    final isCorrect = widget.record.score == 1;
+    final isCorrect = widget.isCorrect;
     final scoreHistory = ScoreManager.scoreHistory;
 
     return WillPopScope(
@@ -72,10 +78,9 @@ class _ResultScreenState extends State<ResultScreen> {
                         Text('今回の記録',
                             style: Theme.of(context).textTheme.titleLarge),
                         SizedBox(height: 8),
-                        Text('モード: ${widget.record.mode}'),
-                        Text('難易度: ${widget.record.difficulty}'),
-                        Text(
-                            'タイム: ${TimeFormatter.format(widget.record.time)}'),
+                        Text('モード: ${widget.mode}'),
+                        Text('難易度: ${widget.difficulty}'),
+                        Text('タイム: ${TimeFormatter.format(widget.timeTaken)}'),
                       ],
                     ),
                   ),
@@ -89,8 +94,8 @@ class _ResultScreenState extends State<ResultScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => GameScreen(
-                          mode: widget.record.mode,
-                          difficulty: widget.record.difficulty,
+                          mode: widget.mode,
+                          difficulty: widget.difficulty,
                           cumulativeScore: widget.cumulativeScore,
                         ),
                       ),
@@ -104,10 +109,10 @@ class _ResultScreenState extends State<ResultScreen> {
                     // 正解していて、連続スコアがある場合に履歴へ保存する
                     if (isCorrect && widget.cumulativeScore > 0) {
                       final finalRecord = ScoreRecord(
-                        mode: widget.record.mode,
-                        difficulty: widget.record.difficulty,
+                        mode: widget.mode,
+                        difficulty: widget.difficulty,
                         score: widget.cumulativeScore, // 最終的な連続正解数を保存
-                        time: widget.record.time,
+                        time: widget.timeTaken,
                         dateTime: DateTime.now(),
                       );
                       ScoreManager.addScore(finalRecord);

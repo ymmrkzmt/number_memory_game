@@ -29,6 +29,7 @@ class _InputScreenState extends State<InputScreen> {
   late Timer _timer;
   late int _timeLimit;
   late int _currentTime;
+  bool _isSubmitting = false; // 回答処理中かどうかのフラグ
 
   /// Stateの初期化を行い、タイマーを設定・開始する
   @override
@@ -50,7 +51,7 @@ class _InputScreenState extends State<InputScreen> {
   /// 1秒ごとにカウントダウンするタイマーを開始する
   void _startTimer() {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if (_currentTime == 0) {
+      if (_currentTime <= 0) {
         _submitAnswer();
       } else {
         setState(() => _currentTime--);
@@ -60,6 +61,10 @@ class _InputScreenState extends State<InputScreen> {
 
   /// ユーザーの回答を検証し、結果を保存して結果画面に遷移する
   void _submitAnswer() {
+    if (_isSubmitting) return; // すでに処理中の場合は何もしない
+    setState(() {
+      _isSubmitting = true; // 処理中に設定
+    });
     _timer.cancel();
     final userInput = _controller.text.trim();
     final isCorrect = userInput == widget.correctAnswer;
@@ -87,14 +92,11 @@ class _InputScreenState extends State<InputScreen> {
         builder: (context) => ResultScreen(
           userAnswer: userInput,
           correctAnswer: widget.correctAnswer,
-          // 表示用のダミーレコードを作成（保存はしない）
-          record: ScoreRecord(
-              mode: widget.mode,
-              difficulty: widget.difficulty,
-              score: isCorrect ? 1 : 0,
-              time: timeTaken,
-              dateTime: DateTime.now()),
+          isCorrect: isCorrect,
+          timeTaken: timeTaken,
           cumulativeScore: newCumulativeScore,
+          mode: widget.mode,
+          difficulty: widget.difficulty,
         ),
       ),
     );
@@ -185,7 +187,7 @@ class _InputScreenState extends State<InputScreen> {
             PhoneKeypad(
               onDigitPressed: isPhoneMode ? _appendDigit : _appendNumber,
               onDelete: isPhoneMode ? _deleteLastDigit : _deleteLastNumber,
-              onSubmit: _submitAnswer,
+              onSubmit: _isSubmitting ? () {} : _submitAnswer,
             ),
           ],
         ),

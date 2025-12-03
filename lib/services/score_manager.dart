@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:number_memory_game/models/score_record.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,7 +26,7 @@ class ScoreManager {
                 return ScoreRecord.fromJson(decoded);
               }
             } catch (e) {
-              print('スコア履歴のデコードに失敗: $s, エラー: $e');
+              debugPrint('スコア履歴のデコードに失敗: $s, エラー: $e');
             }
             return null;
           })
