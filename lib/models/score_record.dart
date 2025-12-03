@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
 
-@immutable
-
 /// 1回のゲーム結果を保持する不変クラス
+@immutable
 class ScoreRecord {
   const ScoreRecord({
     required this.mode,
@@ -18,7 +17,7 @@ class ScoreRecord {
   /// 難易度 ('Easy', 'Normal', 'Hard')
   final String difficulty;
 
-  /// スコア (正解: 1, 不正解: 0)
+  /// 連続正解数 (このゲームで連続して正解した回数)
   final int score;
 
   /// 回答にかかった時間

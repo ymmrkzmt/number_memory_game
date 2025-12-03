@@ -36,8 +36,8 @@ class _ResultScreenState extends State<ResultScreen> {
     final isCorrect = widget.isCorrect;
     final scoreHistory = ScoreManager.scoreHistory;
 
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      canPop: false,
       child: Scaffold(
         appBar: AppBar(
           title: Text('結果'),

@@ -51,8 +51,11 @@ class _InputScreenState extends State<InputScreen> {
   /// 1秒ごとにカウントダウンするタイマーを開始する
   void _startTimer() {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      // ウィジェットが破棄されている場合はタイマーを停止して終了
+      if (!mounted) return timer.cancel();
+
       if (_currentTime <= 0) {
-        _submitAnswer();
+        _submitAnswer(); // この中でタイマーはキャンセルされる
       } else {
         setState(() => _currentTime--);
       }
@@ -61,11 +64,11 @@ class _InputScreenState extends State<InputScreen> {
 
   /// ユーザーの回答を検証し、結果を保存して結果画面に遷移する
   void _submitAnswer() {
-    if (_isSubmitting) return; // すでに処理中の場合は何もしない
-    setState(() {
-      _isSubmitting = true; // 処理中に設定
-    });
+    // 処理中、またはウィジェットが破棄されている場合は何もしない
+    if (_isSubmitting || !mounted) return;
+
     _timer.cancel();
+    setState(() => _isSubmitting = true); // 処理中に設定
     final userInput = _controller.text.trim();
     final isCorrect = userInput == widget.correctAnswer;
     final timeTaken = Duration(seconds: _timeLimit - _currentTime);
