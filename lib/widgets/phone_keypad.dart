@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 
+/// 電話のテンキー風のカスタムキーパッドWidget
 class PhoneKeypad extends StatefulWidget {
+  /// 数字ボタンが押されたときのコールバック
   final void Function(String digit) onDigitPressed;
+
+  /// 削除ボタンが押されたときのコールバック
   final VoidCallback onDelete;
+
+  /// 送信(OK)ボタンが押されたときのコールバック
   final VoidCallback onSubmit;
 
   const PhoneKeypad({
@@ -16,9 +22,12 @@ class PhoneKeypad extends StatefulWidget {
   _PhoneKeypadState createState() => _PhoneKeypadState();
 }
 
+/// PhoneKeypadの状態を管理するStateクラス
 class _PhoneKeypadState extends State<PhoneKeypad> {
+  /// 押されているキーのラベルを保持する
   String? pressedKey;
 
+  /// キーが押されたときの処理。UIのフィードバックとコールバックの呼び出しを行う
   void _handlePress(String label) {
     setState(() => pressedKey = label);
 
@@ -35,12 +44,14 @@ class _PhoneKeypadState extends State<PhoneKeypad> {
     }
   }
 
+  /// ボタンのラベルに応じて色を返す
   Color _getButtonColor(String label) {
     if (label == '←') return Colors.red.shade300;
     if (label == 'OK') return Colors.green.shade400;
     return Colors.blue.shade300;
   }
 
+  /// キーパッドのUIを構築する
   @override
   Widget build(BuildContext context) {
     final rows = [

@@ -42,6 +42,7 @@ Webで確認する場合は、`-d <device>` のようにデバイスを指定し
 
 ```bash
 flutter run -d chrome --dart-define=GOOGLE_TAG_ID=G-DEV1234567
+flutter run -d web-server --web-port=8080
 ```
 
 利用可能なデバイスの一覧は `flutter devices` コマンドで確認できます。
