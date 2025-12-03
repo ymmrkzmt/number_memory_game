@@ -16,7 +16,7 @@ class ScoreHistoryList extends StatelessWidget {
           ? [
               const Center(
                   child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(8.0),
                 child: Text('履歴がまだありません'),
               ))
             ]

@@ -41,11 +41,6 @@ class _ModeSelectScreenState extends State<ModeSelectScreen> {
       MaterialPageRoute(builder: (context) => SettingsScreen()),
     );
 
-    // 設定画面から戻ってきたときにUIを更新する
-    setState(() {
-      // Note: difficultyの更新は_loadDifficultyで行われる
-    });
-
     if (result != null && result is String) {
       setState(() => difficulty = result);
       print('[ModeSelectScreen] 難易度が更新されました: $difficulty');
