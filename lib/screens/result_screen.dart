@@ -1,82 +1,132 @@
 import 'package:flutter/material.dart';
+import 'package:number_memory_game/models/score_record.dart';
+import 'package:number_memory_game/utils/formatter.dart';
 import 'mode_select_screen.dart';
 import 'game_screen.dart';
-import '../services/score_manager.dart'; // ✅ スコア管理をインポート
+import '../services/score_manager.dart';
+import '../widgets/score_history_list.dart';
 
-class ResultScreen extends StatelessWidget {
+class ResultScreen extends StatefulWidget {
   final String userAnswer;
   final String correctAnswer;
-  final String mode;
-  final String difficulty;
+  final int cumulativeScore;
+  final ScoreRecord record;
 
   const ResultScreen({
     required this.userAnswer,
     required this.correctAnswer,
-    required this.mode,
-    required this.difficulty,
+    required this.record,
+    required this.cumulativeScore,
     super.key,
   });
 
   @override
+  State<ResultScreen> createState() => _ResultScreenState();
+}
+
+class _ResultScreenState extends State<ResultScreen> {
+  @override
   Widget build(BuildContext context) {
-    final bool isCorrect = userAnswer == correctAnswer;
+    final isCorrect = widget.record.score == 1;
+    final scoreHistory = ScoreManager.scoreHistory;
 
-    if (isCorrect) {
-      ScoreManager.increment(); // ✅ 正解ならスコア加算
-    }
-
-    return Scaffold(
-      appBar: AppBar(title: Text('結果')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('あなたの答え: $userAnswer', style: TextStyle(fontSize: 24)),
-            SizedBox(height: 16),
-            Text('正解: $correctAnswer', style: TextStyle(fontSize: 24)),
-            SizedBox(height: 32),
-            Text(
-              isCorrect ? '正解！🎉' : '不正解 😢',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: isCorrect ? Colors.green : Colors.red,
-              ),
-            ),
-            SizedBox(height: 24),
-            Text('現在のスコア: ${ScoreManager.score}', style: TextStyle(fontSize: 20)),
-            SizedBox(height: 40),
-
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => GameScreen(
-                      mode: mode,
-                      difficulty: difficulty,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('結果'),
+          automaticallyImplyLeading: false,
+        ),
+        body: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('あなたの答え: ${widget.userAnswer}',
+                    style: TextStyle(fontSize: 24)),
+                SizedBox(height: 16),
+                Text('正解: ${widget.correctAnswer}',
+                    style: TextStyle(fontSize: 24)),
+                SizedBox(height: 32),
+                Text(
+                  isCorrect ? '正解！🎉' : '不正解 😢',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: isCorrect ? Colors.green : Colors.red,
+                  ),
+                ),
+                if (isCorrect && widget.cumulativeScore > 1)
+                  Text(
+                    '${widget.cumulativeScore}問連続正解！',
+                    style:
+                        TextStyle(fontSize: 20, color: Colors.orange.shade800),
+                  ),
+                SizedBox(height: 24),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Text('今回の記録',
+                            style: Theme.of(context).textTheme.titleLarge),
+                        SizedBox(height: 8),
+                        Text('モード: ${widget.record.mode}'),
+                        Text('難易度: ${widget.record.difficulty}'),
+                        Text(
+                            'タイム: ${TimeFormatter.format(widget.record.time)}'),
+                      ],
                     ),
                   ),
-                );
-              },
-              child: Text('もう一度挑戦する'),
-            ),
-            SizedBox(height: 16),
+                ),
+                SizedBox(height: 24),
+                ScoreHistoryList(scoreHistory: scoreHistory),
+                SizedBox(height: 40),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => GameScreen(
+                          mode: widget.record.mode,
+                          difficulty: widget.record.difficulty,
+                          cumulativeScore: widget.cumulativeScore,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text('もう一度挑戦する'),
+                ),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    // 正解していて、連続スコアがある場合に履歴へ保存する
+                    if (isCorrect && widget.cumulativeScore > 0) {
+                      final finalRecord = ScoreRecord(
+                        mode: widget.record.mode,
+                        difficulty: widget.record.difficulty,
+                        score: widget.cumulativeScore, // 最終的な連続正解数を保存
+                        time: widget.record.time,
+                        dateTime: DateTime.now(),
+                      );
+                      ScoreManager.addScore(finalRecord);
+                    }
 
-            ElevatedButton(
-              onPressed: () {
-                ScoreManager.reset(); // ✅ 戻るときにスコアリセット（任意）
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ModeSelectScreen(),
-                  ),
-                  (route) => false,
-                );
-              },
-              child: Text('モード選択に戻る'),
+                    // モード選択画面に戻る
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ModeSelectScreen(),
+                      ),
+                      (route) => false,
+                    );
+                  },
+                  child: Text('モード選択に戻る'),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

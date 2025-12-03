@@ -2,13 +2,18 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'input_screen.dart';
 
+/// 数字や電話番号を記憶するゲーム画面のWidget
 class GameScreen extends StatefulWidget {
-  final String mode;        // 'phone' or 'number'
-  final String difficulty;  // 'Easy', 'Normal', 'Hard'
+  /// ゲームモード ('phone' or 'number')
+  final String mode; // 'phone' or 'number'
+  /// 難易度 ('Easy', 'Normal', 'Hard')
+  final String difficulty; // 'Easy', 'Normal', 'Hard'
+  final int cumulativeScore;
 
   const GameScreen({
     required this.mode,
     required this.difficulty,
+    required this.cumulativeScore,
     super.key,
   });
 
@@ -23,6 +28,7 @@ class _GameScreenState extends State<GameScreen> {
   late int digitCount;
   late Duration displayDuration;
 
+  /// Stateの初期化を行い、難易度に応じた設定を適用し、値を生成する
   @override
   void initState() {
     super.initState();
@@ -45,6 +51,7 @@ class _GameScreenState extends State<GameScreen> {
     generateValue();
   }
 
+  /// ランダムな電話番号を生成する
   String _generatePhoneNumber() {
     final rand = Random();
     final prefix = ['090', '080', '070'][rand.nextInt(3)];
@@ -53,6 +60,7 @@ class _GameScreenState extends State<GameScreen> {
     return '$prefix-$mid-$last';
   }
 
+  /// 難易度に応じた桁数のランダムな数字を生成する
   String _generateNumber() {
     final rand = Random();
     String result = '';
@@ -62,6 +70,7 @@ class _GameScreenState extends State<GameScreen> {
     return result;
   }
 
+  /// ゲームモードに応じて記憶する値を生成し、一定時間表示した後に回答画面へ遷移する
   void generateValue() {
     if (widget.mode == 'phone') {
       valueToRemember = _generatePhoneNumber();
@@ -70,8 +79,6 @@ class _GameScreenState extends State<GameScreen> {
     } else {
       throw Exception('Unsupported mode: ${widget.mode}');
     }
-
-    print('[GameScreen] 正解: $valueToRemember (mode: ${widget.mode}, difficulty: ${widget.difficulty})');
 
     setState(() => showValue = true);
 
@@ -84,6 +91,8 @@ class _GameScreenState extends State<GameScreen> {
             builder: (context) => InputScreen(
               correctAnswer: valueToRemember,
               mode: widget.mode,
+              difficulty: widget.difficulty, // ✅ 難易度を渡す
+              cumulativeScore: widget.cumulativeScore,
             ),
           ),
         );
@@ -91,6 +100,7 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
+  /// 記憶する値を表示するUIを構築する
   @override
   Widget build(BuildContext context) {
     return Scaffold(

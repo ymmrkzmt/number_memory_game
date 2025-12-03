@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/mode_select_screen.dart';
+import 'services/score_manager.dart'; // ✅ ScoreManagerをインポート
 import 'package:flutter/foundation.dart'; // kIsWeb を使うために必要
 import 'dart:html' as html; // Webでのみ利用可能なライブラリ
 
@@ -37,21 +38,37 @@ void initializeGoogleTag() {
   }
 }
 
+/// アプリケーションのエントリーポイント
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await ScoreManager.init(); // ✅ アプリ起動時にスコアを読み込む
   initializeGoogleTag();
   runApp(const MyApp());
 }
 
+/// アプリケーションのルートWidget
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  /// アプリケーションのルートWidgetを構築する
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: '記憶ゲーム',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: ModeSelectScreen(), // ✅ 最初に表示する画面
+      home: const ModeSelectScreen(), // ✅ 最初に表示する画面
+      builder: (context, child) {
+        // Webやデスクトップ向けに、中央にコンテンツを配置する
+        return Container(
+          color: Colors.grey[200], // 背景色
+          child: Center(
+            child: SizedBox(
+              width: 480, // コンテンツの最大幅
+              child: child, // MaterialAppがビルドする画面
+            ),
+          ),
+        );
+      },
     );
   }
 }
